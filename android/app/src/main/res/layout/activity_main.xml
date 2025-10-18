@@ -51,6 +51,59 @@
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
+    <!-- Scroll until text -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+        <EditText
+            android:id="@+id/edtScrollText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="텍스트"/>
+        <EditText
+            android:id="@+id/edtScrollMax"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/max_swipes"
+            android:inputType="number"/>
+        <CheckBox
+            android:id="@+id/chkScrollDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dir_down"
+            android:checked="true"/>
+        <Button
+            android:id="@+id/btnAddScrollText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/scroll_until_text"/>
+    </LinearLayout>
+
+    <!-- Find by image label (content description) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+        <EditText
+            android:id="@+id/edtImageLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="콘텐츠 설명(이미지 라벨)"/>
+        <Button
+            android:id="@+id/btnAddFindImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/add_find_image"/>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

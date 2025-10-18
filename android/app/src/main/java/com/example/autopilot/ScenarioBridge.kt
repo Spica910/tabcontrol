@@ -50,4 +50,16 @@ object ScenarioBridge {
         })
         export(ctx)
     }
+
+    fun addScrollUntilText(ctx: Context, text: String, max: Int, down: Boolean) {
+        cached.put(JSONObject().apply {
+            put("type","scroll_until_text"); put("text", text); put("max", max); put("down", down)
+        })
+        export(ctx)
+    }
+
+    fun addFindImageLabel(ctx: Context, label: String) {
+        cached.put(JSONObject().apply { put("type","find_image_label"); put("label", label) })
+        export(ctx)
+    }
 }

@@ -59,6 +59,12 @@ class MainActivity : ComponentActivity() {
         val edtSwipeXY2 = findViewById<EditText>(R.id.edtSwipeXY2)
         val edtSwipeDur = findViewById<EditText>(R.id.edtSwipeDur)
         val btnAddSwipe = findViewById<Button>(R.id.btnAddSwipe)
+        val edtScrollText = findViewById<EditText>(R.id.edtScrollText)
+        val edtScrollMax = findViewById<EditText>(R.id.edtScrollMax)
+        val chkScrollDown = findViewById<CheckBox>(R.id.chkScrollDown)
+        val btnAddScrollText = findViewById<Button>(R.id.btnAddScrollText)
+        val edtImageLabel = findViewById<EditText>(R.id.edtImageLabel)
+        val btnAddFindImage = findViewById<Button>(R.id.btnAddFindImage)
 
         edtPackage.setText(vm.targetPackage)
 
@@ -151,6 +157,21 @@ class MainActivity : ComponentActivity() {
             if (p1.size==2 && p2.size==2) {
                 ScenarioBridge.addSwipe(this, p1[0], p1[1], p2[0], p2[1], dur)
                 txtStatus.text = "상태: 스와이프 스텝 추가"
+            }
+        }
+
+        btnAddScrollText.setOnClickListener {
+            val t = edtScrollText.text.toString()
+            val max = edtScrollMax.text.toString().toIntOrNull() ?: 5
+            ScenarioBridge.addScrollUntilText(this, t, max, chkScrollDown.isChecked)
+            txtStatus.text = "상태: 스크롤-텍스트 스텝 추가"
+        }
+
+        btnAddFindImage.setOnClickListener {
+            val label = edtImageLabel.text.toString()
+            if (label.isNotEmpty()) {
+                ScenarioBridge.addFindImageLabel(this, label)
+                txtStatus.text = "상태: 이미지 라벨 스텝 추가"
             }
         }
     }
