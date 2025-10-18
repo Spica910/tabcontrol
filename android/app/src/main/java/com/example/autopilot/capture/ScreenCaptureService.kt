@@ -15,6 +15,7 @@ import java.nio.ByteBuffer
 class ScreenCaptureService : Service() {
     private var projection: MediaProjection? = null
     private var imageReader: ImageReader? = null
+    private var vd: android.hardware.display.VirtualDisplay? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -26,11 +27,12 @@ class ScreenCaptureService : Service() {
             projection = mgr.getMediaProjection(resultCode, data!!)
             val dm = resources.displayMetrics
             imageReader = ImageReader.newInstance(dm.widthPixels, dm.heightPixels, PixelFormat.RGBA_8888, 2)
-            val virt = projection!!.createVirtualDisplay(
+            vd = projection!!.createVirtualDisplay(
                 "ap-cap", dm.widthPixels, dm.heightPixels, dm.densityDpi,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 imageReader!!.surface, null, null
             )
+            instance = this
         } else if (intent?.action == ACTION_STOP) {
             stopSelf()
         }
@@ -46,24 +48,34 @@ class ScreenCaptureService : Service() {
         val width = img.width
         val height = img.height
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val tmp = IntArray(width)
-        var offset = 0
+        // Efficient copy respecting rowStride
+        val rowBuffer = ByteArray(rowStride)
         for (y in 0 until height) {
             buf.position(y * rowStride)
-            val row = ByteArray(width * pixelStride)
-            buf.get(row, 0, row.size)
-            for (x in 0 until width) {
-                val i = x * pixelStride
-                val b = row[i].toInt() and 0xff
-                val g = row[i+1].toInt() and 0xff
-                val r = row[i+2].toInt() and 0xff
-                val a = if (pixelStride > 3) row[i+3].toInt() and 0xff else 0xff
-                tmp[x] = (a shl 24) or (r shl 16) or (g shl 8) or b
+            buf.get(rowBuffer, 0, rowStride)
+            var xPixel = 0
+            var idx = 0
+            while (xPixel < width) {
+                val b = rowBuffer[idx].toInt() and 0xFF
+                val g = rowBuffer[idx + 1].toInt() and 0xFF
+                val r = rowBuffer[idx + 2].toInt() and 0xFF
+                val a = if (pixelStride >= 4) rowBuffer[idx + 3].toInt() and 0xFF else 0xFF
+                val color = (a shl 24) or (r shl 16) or (g shl 8) or b
+                bitmap.setPixel(xPixel, y, color)
+                xPixel += 1
+                idx += pixelStride
             }
-            bitmap.setPixels(tmp, 0, width, 0, y, width, 1)
         }
         img.close()
         return bitmap
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        vd?.release(); vd = null
+        imageReader?.close(); imageReader = null
+        projection?.stop(); projection = null
+        if (instance === this) instance = null
     }
 
     companion object {
@@ -71,5 +83,10 @@ class ScreenCaptureService : Service() {
         const val ACTION_STOP = "cap.STOP"
         const val EXTRA_CODE = "code"
         const val EXTRA_DATA = "data"
+
+        @Volatile
+        var instance: ScreenCaptureService? = null
+
+        fun captureLatest(): Bitmap? = instance?.capture()
     }
 }

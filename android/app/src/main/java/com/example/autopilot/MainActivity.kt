@@ -22,6 +22,9 @@ import android.content.ClipboardManager
 import android.net.Uri
 import android.graphics.BitmapFactory
 import android.util.Base64
+import android.app.Activity.RESULT_OK
+import android.hardware.display.MediaProjectionManager
+import com.example.autopilot.capture.ScreenCaptureService
 
 class MainViewModel: ViewModel() {
     var targetPackage: String = ""
@@ -88,6 +91,10 @@ class MainActivity : ComponentActivity() {
         btnPickApp.setOnClickListener {
             startActivityForResult(Intent(this, AppPickerActivity::class.java), 1001)
         }
+
+        // Request screen capture permission
+        val mpm = getSystemService(MediaProjectionManager::class.java)
+        startActivityForResult(mpm.createScreenCaptureIntent(), 2001)
 
         btnLaunch.setOnClickListener {
             vm.targetPackage = edtPackage.text.toString().trim()
@@ -200,6 +207,15 @@ class MainActivity : ComponentActivity() {
             val pkg = data?.getStringExtra("package") ?: return
             data.Prefs.setTargetPackage(this, pkg)
             findViewById<EditText>(R.id.edtPackage).setText(pkg)
+        }
+        if (requestCode == 2001 && resultCode == RESULT_OK) {
+            // Start ScreenCaptureService
+            val i = Intent(this, ScreenCaptureService::class.java).apply {
+                action = ScreenCaptureService.ACTION_START
+                putExtra(ScreenCaptureService.EXTRA_CODE, resultCode)
+                putExtra(ScreenCaptureService.EXTRA_DATA, data)
+            }
+            startService(i)
         }
         if (requestCode == 2002 && resultCode == Activity.RESULT_OK) {
             val uri: Uri = data?.data ?: return

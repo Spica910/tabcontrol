@@ -19,6 +19,7 @@ import android.graphics.Color
 import android.view.View
 import android.graphics.Bitmap
 import android.util.Base64
+import com.example.autopilot.capture.ScreenCaptureService
 
 class AutoPilotService : AccessibilityService() {
 
@@ -183,9 +184,9 @@ class AutoPilotService : AccessibilityService() {
             }
             is Step.Template -> {
                 showTip("이미지 템플릿", null)
-                val screen = captureScreenOnce() ?: return false
+                val screenBmp = ScreenCaptureService.captureLatest() ?: return false
                 val templ = decodeBase64Png(step.imgBase64) ?: return false
-                val found = findTemplate(screen, templ, step.th)
+                val found = findTemplate(screenBmp, templ, step.th)
                 if (found != null) { tapRect(found); true } else false
             }
         }
@@ -293,12 +294,65 @@ class AutoPilotService : AccessibilityService() {
         } catch (_: Throwable) {}
     }
 
-    private fun captureScreenOnce(): android.graphics.Rect? = null // placeholder; implement via bound service or projection callback
     private fun decodeBase64Png(b64: String): Bitmap? = try { val bytes = Base64.decode(b64, Base64.DEFAULT); android.graphics.BitmapFactory.decodeByteArray(bytes,0,bytes.size) } catch (_:Throwable){ null }
+    private fun findTemplate(screen: Bitmap, templ: Bitmap, th: Float): Rect? {
+        // Simple grayscale NCC search with downscale for speed
+        val scale = 0.5f
+        val screenScaled = Bitmap.createScaledBitmap(screen, (screen.width * scale).toInt(), (screen.height * scale).toInt(), true)
+        val templScaled = Bitmap.createScaledBitmap(templ, (templ.width * scale).toInt().coerceAtLeast(1), (templ.height * scale).toInt().coerceAtLeast(1), true)
 
-    private fun findTemplate(screenRect: android.graphics.Rect?, templ: Bitmap, th: Float): Rect? {
-        // Placeholder: without bitmap of screen we can't compute; return null for now
-        return null
+        val sw = screenScaled.width; val sh = screenScaled.height
+        val tw = templScaled.width; val thh = templScaled.height
+        if (tw <= 1 || thh <= 1 || sw < tw || sh < thh) return null
+
+        val sPix = IntArray(sw * sh); screenScaled.getPixels(sPix, 0, sw, 0, 0, sw, sh)
+        val tPix = IntArray(tw * thh); templScaled.getPixels(tPix, 0, tw, 0, 0, tw, thh)
+
+        fun gray(c:Int)= ((c shr 16 and 0xFF)*299 + (c shr 8 and 0xFF)*587 + (c and 0xFF)*114)/1000.0
+        val tMean = tPix.asSequence().map { gray(it) }.average()
+        val tVar = tPix.asSequence().map { val v=gray(it)-tMean; v*v }.sum()
+        if (tVar == 0.0) return null
+
+        var best = -1.0
+        var bestX = 0; var bestY = 0
+        for (y in 0 .. sh - thh) {
+            for (x in 0 .. sw - tw) {
+                var sMean = 0.0
+                var n = 0
+                var idxS = y * sw + x
+                // mean
+                for (j in 0 until thh) {
+                    for (i in 0 until tw) { sMean += gray(sPix[idxS + i]); n += 1 }
+                    idxS += sw
+                }
+                sMean /= n
+                var sVar = 0.0
+                var num = 0.0
+                idxS = y * sw + x
+                var idxT = 0
+                for (j in 0 until thh) {
+                    for (i in 0 until tw) {
+                        val gs = gray(sPix[idxS + i]) - sMean
+                        val gt = gray(tPix[idxT]) - tMean
+                        num += gs * gt
+                        sVar += gs * gs
+                        idxT += 1
+                    }
+                    idxS += sw
+                }
+                val denom = Math.sqrt(sVar * tVar)
+                if (denom > 0) {
+                    val score = num / denom
+                    if (score > best) { best = score; bestX = x; bestY = y }
+                }
+            }
+        }
+        if (best < th) return null
+        val rx = (bestX / scale).toInt()
+        val ry = (bestY / scale).toInt()
+        val rw = (tw / scale).toInt()
+        val rh = (thh / scale).toInt()
+        return Rect(rx, ry, rx + rw, ry + rh)
     }
 
     private fun scrollUntilText(text: String, max: Int, down: Boolean, onDone: () -> Unit){
