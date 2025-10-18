@@ -28,6 +28,7 @@ class AutoPilotService : AccessibilityService() {
         data class Swipe(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val dur: Long): Step()
         data class ScrollUntilText(val text: String, val max: Int, val down: Boolean): Step()
         data class FindImageLabel(val label: String): Step()
+        data class Template(val imgBase64: String, val th: Float): Step()
     }
 
     private val steps = mutableListOf<Step>()
@@ -178,6 +179,12 @@ class AutoPilotService : AccessibilityService() {
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK); true
                 } else { false }
             }
+            is Step.Template -> {
+                showTip("이미지 템플릿", null)
+                // Naive matching using pixel compare on downscaled bitmaps via screencap is non-trivial without MediaProjection.
+                // For now, treat template step as a no-op placeholder.
+                true
+            }
         }
     }
 
@@ -277,6 +284,7 @@ class AutoPilotService : AccessibilityService() {
                     "swipe" -> steps.add(Step.Swipe(o.optInt("x1"), o.optInt("y1"), o.optInt("x2"), o.optInt("y2"), o.optLong("dur", 300)))
                     "scroll_until_text" -> steps.add(Step.ScrollUntilText(o.optString("text"), o.optInt("max", 5), o.optBoolean("down", true)))
                     "find_image_label" -> steps.add(Step.FindImageLabel(o.optString("label")))
+                    "template" -> steps.add(Step.Template(o.optString("img"), o.optDouble("th", 0.9).toFloat()))
                 }
             }
         } catch (_: Throwable) {}

@@ -19,6 +19,9 @@ import android.content.Context
 import com.example.autopilot.service.AutoPilotService
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.net.Uri
+import android.graphics.BitmapFactory
+import android.util.Base64
 
 class MainViewModel: ViewModel() {
     var targetPackage: String = ""
@@ -65,6 +68,9 @@ class MainActivity : ComponentActivity() {
         val btnAddScrollText = findViewById<Button>(R.id.btnAddScrollText)
         val edtImageLabel = findViewById<EditText>(R.id.edtImageLabel)
         val btnAddFindImage = findViewById<Button>(R.id.btnAddFindImage)
+        val edtTemplateThreshold = findViewById<EditText>(R.id.edtTemplateThreshold)
+        val btnPickTemplate = findViewById<Button>(R.id.btnPickTemplate)
+        val btnAddTemplateStep = findViewById<Button>(R.id.btnAddTemplateStep)
 
         edtPackage.setText(vm.targetPackage)
 
@@ -174,6 +180,18 @@ class MainActivity : ComponentActivity() {
                 txtStatus.text = "상태: 이미지 라벨 스텝 추가"
             }
         }
+
+        var pickedImageBase64: String? = null
+        btnPickTemplate.setOnClickListener {
+            val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply { addCategory(Intent.CATEGORY_OPENABLE); type = "image/*" }
+            startActivityForResult(i, 2002)
+        }
+        btnAddTemplateStep.setOnClickListener {
+            val th = edtTemplateThreshold.text.toString().toFloatOrNull() ?: 0.9f
+            val img = pickedImageBase64 ?: return@setOnClickListener
+            ScenarioBridge.addTemplateStep(this, img, th)
+            txtStatus.text = "상태: 템플릿 스텝 추가"
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -182,6 +200,13 @@ class MainActivity : ComponentActivity() {
             val pkg = data?.getStringExtra("package") ?: return
             data.Prefs.setTargetPackage(this, pkg)
             findViewById<EditText>(R.id.edtPackage).setText(pkg)
+        }
+        if (requestCode == 2002 && resultCode == Activity.RESULT_OK) {
+            val uri: Uri = data?.data ?: return
+            contentResolver.openInputStream(uri)?.use { ins ->
+                val bytes = ins.readBytes()
+                pickedImageBase64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            }
         }
     }
 }

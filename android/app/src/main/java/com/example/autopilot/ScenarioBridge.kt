@@ -62,4 +62,9 @@ object ScenarioBridge {
         cached.put(JSONObject().apply { put("type","find_image_label"); put("label", label) })
         export(ctx)
     }
+
+    fun addTemplateStep(ctx: Context, base64Png: String, threshold: Float) {
+        cached.put(JSONObject().apply { put("type","template"); put("img", base64Png); put("th", threshold) })
+        export(ctx)
+    }
 }

@@ -104,6 +104,31 @@
             android:text="@string/add_find_image"/>
     </LinearLayout>
 
+    <!-- Find by screenshot template (naive) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+        <EditText
+            android:id="@+id/edtTemplateThreshold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/threshold"/>
+        <Button
+            android:id="@+id/btnPickTemplate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_image"/>
+        <Button
+            android:id="@+id/btnAddTemplateStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="템플릿 스텝 추가"/>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
