@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
         val btnPlay = findViewById<Button>(R.id.btnPlay)
         val btnStep = findViewById<Button>(R.id.btnStep)
         val btnClear = findViewById<Button>(R.id.btnClear)
+        val btnViewSteps = findViewById<Button>(R.id.btnViewSteps)
         val btnExport = findViewById<Button>(R.id.btnExport)
         val btnImport = findViewById<Button>(R.id.btnImport)
         val chkAutoPlay = findViewById<CheckBox>(R.id.chkAutoPlay)
@@ -104,6 +105,7 @@ class MainActivity : ComponentActivity() {
         btnPlay.setOnClickListener { sendToService(AutoPilotService.ACTION_PLAY) }
         btnStep.setOnClickListener { sendToService(AutoPilotService.ACTION_STEP) }
         btnClear.setOnClickListener { sendToService(AutoPilotService.ACTION_CLEAR) }
+        btnViewSteps.setOnClickListener { startActivity(Intent(this, com.example.autopilot.ui.ScenarioEditorActivity::class.java)) }
 
         btnExport.setOnClickListener {
             val cm = getSystemService(ClipboardManager::class.java)

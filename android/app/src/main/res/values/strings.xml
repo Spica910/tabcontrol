@@ -15,6 +15,10 @@
     <string name="add_sleep">대기 추가</string>
     <string name="add_input_text">텍스트 입력 추가</string>
     <string name="add_swipe">스와이프 추가</string>
+    <string name="view_steps">스텝 보기</string>
+    <string name="delete">삭제</string>
+    <string name="move_up">위로</string>
+    <string name="move_down">아래로</string>
     <string name="ms">ms</string>
     <string name="wait_text">텍스트 대기</string>
     <string name="timeout_ms">타임아웃(ms)</string>
