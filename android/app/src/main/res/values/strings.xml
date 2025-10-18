@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">AutoPilot</string>
+    <string name="start_service">서비스 시작</string>
+    <string name="stop_service">서비스 정지</string>
+    <string name="open_accessibility">접근성 설정 열기</string>
+    <string name="launch_target">대상 앱 실행</string>
+    <string name="record">기록</string>
+    <string name="play">재생</string>
+    <string name="step">한 단계</string>
+    <string name="clear">초기화</string>
+    <string name="package_hint">패키지명 (예: com.example.target)</string>
+</resources>
