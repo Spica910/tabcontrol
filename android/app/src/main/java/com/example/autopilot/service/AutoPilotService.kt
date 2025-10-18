@@ -287,6 +287,9 @@ class AutoPilotService : AccessibilityService() {
         const val ACTION_PLAY = "com.example.autopilot.PLAY"
         const val ACTION_STEP = "com.example.autopilot.STEP"
         const val ACTION_CLEAR = "com.example.autopilot.CLEAR"
+        const val ACTION_IMPORT = "com.example.autopilot.IMPORT"
+        const val ACTION_SET_PACKAGE = "com.example.autopilot.SET_PACKAGE"
+        const val ACTION_LAUNCH = "com.example.autopilot.LAUNCH"
     }
 
     private fun saveScenarioToPrefs(){
