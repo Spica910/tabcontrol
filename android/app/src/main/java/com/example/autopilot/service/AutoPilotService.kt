@@ -133,14 +133,35 @@ class AutoPilotService : AccessibilityService() {
     private fun playStep(step: Step): Boolean {
         return when(step) {
             is Step.Tap -> {
-                val node = findNodeBySelector(step.selector)
-                if (node != null) {
-                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                val nodeNow = findNodeBySelector(step.selector)
+                if (nodeNow != null) {
+                    nodeNow.performAction(AccessibilityNodeInfo.ACTION_CLICK)
                     hideTip()
                     true
                 } else {
-                    val r = step.rect
-                    if (r != null) { showTip("여기를 탭", r); tapRect(r); true } else false
+                    // 자동 스크롤 탐색 후 클릭 시 진행
+                    val maxDown = 7; val maxUp = 3
+                    tryScrollToFind(step.selector, maxDown, true) { foundDown ->
+                        if (foundDown != null) {
+                            foundDown.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                            currentIndex += 1
+                            if (running) handler.postDelayed({ stepNext() }, 250)
+                        } else {
+                            tryScrollToFind(step.selector, maxUp, false) { foundUp ->
+                                if (foundUp != null) {
+                                    foundUp.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                                    currentIndex += 1
+                                    if (running) handler.postDelayed({ stepNext() }, 250)
+                                } else {
+                                    val r = step.rect
+                                    if (r != null) { showTip("여기를 탭", r); tapRect(r) }
+                                    currentIndex += 1
+                                    if (running) handler.postDelayed({ stepNext() }, 250)
+                                }
+                            }
+                        }
+                    }
+                    false
                 }
             }
             is Step.Sleep -> {
@@ -180,7 +201,28 @@ class AutoPilotService : AccessibilityService() {
                 val node = rootInActiveWindow?.findAccessibilityNodeInfosByText(step.label)?.firstOrNull()
                 if (node != null) {
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK); true
-                } else { false }
+                } else {
+                    val maxDown = 7; val maxUp = 3
+                    tryScrollToFindText(step.label, maxDown, true) { foundDown ->
+                        if (foundDown != null) {
+                            foundDown.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                            currentIndex += 1
+                            if (running) handler.postDelayed({ stepNext() }, 250)
+                        } else {
+                            tryScrollToFindText(step.label, maxUp, false) { foundUp ->
+                                if (foundUp != null) {
+                                    foundUp.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                                    currentIndex += 1
+                                    if (running) handler.postDelayed({ stepNext() }, 250)
+                                } else {
+                                    currentIndex += 1
+                                    if (running) handler.postDelayed({ stepNext() }, 250)
+                                }
+                            }
+                        }
+                    }
+                    false
+                }
             }
             is Step.Template -> {
                 showTip("이미지 템플릿", null)
@@ -372,6 +414,53 @@ class AutoPilotService : AccessibilityService() {
             dispatchGesture(gesture, object: GestureResultCallback(){
                 override fun onCompleted(gestureDescription: GestureDescription?) {
                     handler.postDelayed({ tick() }, 300)
+                }
+            }, null)
+        }
+        tick()
+    }
+
+    private fun tryScrollToFind(selector: String?, max: Int, down: Boolean, onDone: (AccessibilityNodeInfo?) -> Unit){
+        if (selector == null) { onDone(null); return }
+        var remaining = max
+        fun check(): AccessibilityNodeInfo? = findNodeBySelector(selector)
+        fun tick(){
+            val node = check()
+            if (node != null || remaining <= 0) { onDone(node); return }
+            remaining -= 1
+            val displayH = resources.displayMetrics.heightPixels
+            val x = resources.displayMetrics.widthPixels / 2f
+            val y1 = if (down) displayH * 0.75f else displayH * 0.25f
+            val y2 = if (down) displayH * 0.25f else displayH * 0.75f
+            val path = Path().apply { moveTo(x, y1); lineTo(x, y2) }
+            val stroke = GestureDescription.StrokeDescription(path, 0, 300)
+            val gesture = GestureDescription.Builder().addStroke(stroke).build()
+            dispatchGesture(gesture, object: GestureResultCallback(){
+                override fun onCompleted(gestureDescription: GestureDescription?) {
+                    handler.postDelayed({ tick() }, 250)
+                }
+            }, null)
+        }
+        tick()
+    }
+
+    private fun tryScrollToFindText(text: String, max: Int, down: Boolean, onDone: (AccessibilityNodeInfo?) -> Unit){
+        var remaining = max
+        fun check(): AccessibilityNodeInfo? = rootInActiveWindow?.findAccessibilityNodeInfosByText(text)?.firstOrNull()
+        fun tick(){
+            val node = check()
+            if (node != null || remaining <= 0) { onDone(node); return }
+            remaining -= 1
+            val displayH = resources.displayMetrics.heightPixels
+            val x = resources.displayMetrics.widthPixels / 2f
+            val y1 = if (down) displayH * 0.75f else displayH * 0.25f
+            val y2 = if (down) displayH * 0.25f else displayH * 0.75f
+            val path = Path().apply { moveTo(x, y1); lineTo(x, y2) }
+            val stroke = GestureDescription.StrokeDescription(path, 0, 300)
+            val gesture = GestureDescription.Builder().addStroke(stroke).build()
+            dispatchGesture(gesture, object: GestureResultCallback(){
+                override fun onCompleted(gestureDescription: GestureDescription?) {
+                    handler.postDelayed({ tick() }, 250)
                 }
             }, null)
         }
