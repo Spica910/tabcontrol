@@ -18,6 +18,7 @@
     <string name="add_find_image">이미지 스텝 추가</string>
     <string name="pick_image">이미지 선택</string>
     <string name="threshold">임계값(0-1)</string>
+    <string name="screen_cap_perm">화면 캡쳐 권한</string>
     <string name="scroll_until_text">스크롤 후 텍스트 찾기</string>
     <string name="max_swipes">최대 스와이프</string>
     <string name="direction">방향</string>

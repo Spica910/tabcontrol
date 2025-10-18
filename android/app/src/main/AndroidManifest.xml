@@ -26,6 +26,10 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".capture.ScreenCaptureService"
+            android:exported="false" />
+
         <activity
             android:name=".picker.AppPickerActivity"
             android:exported="false"

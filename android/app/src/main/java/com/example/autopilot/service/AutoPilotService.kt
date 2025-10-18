@@ -17,6 +17,8 @@ import android.view.Gravity
 import android.widget.TextView
 import android.graphics.Color
 import android.view.View
+import android.graphics.Bitmap
+import android.util.Base64
 
 class AutoPilotService : AccessibilityService() {
 
@@ -181,9 +183,10 @@ class AutoPilotService : AccessibilityService() {
             }
             is Step.Template -> {
                 showTip("이미지 템플릿", null)
-                // Naive matching using pixel compare on downscaled bitmaps via screencap is non-trivial without MediaProjection.
-                // For now, treat template step as a no-op placeholder.
-                true
+                val screen = captureScreenOnce() ?: return false
+                val templ = decodeBase64Png(step.imgBase64) ?: return false
+                val found = findTemplate(screen, templ, step.th)
+                if (found != null) { tapRect(found); true } else false
             }
         }
     }
@@ -288,6 +291,14 @@ class AutoPilotService : AccessibilityService() {
                 }
             }
         } catch (_: Throwable) {}
+    }
+
+    private fun captureScreenOnce(): android.graphics.Rect? = null // placeholder; implement via bound service or projection callback
+    private fun decodeBase64Png(b64: String): Bitmap? = try { val bytes = Base64.decode(b64, Base64.DEFAULT); android.graphics.BitmapFactory.decodeByteArray(bytes,0,bytes.size) } catch (_:Throwable){ null }
+
+    private fun findTemplate(screenRect: android.graphics.Rect?, templ: Bitmap, th: Float): Rect? {
+        // Placeholder: without bitmap of screen we can't compute; return null for now
+        return null
     }
 
     private fun scrollUntilText(text: String, max: Int, down: Boolean, onDone: () -> Unit){
