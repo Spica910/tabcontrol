@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "com.example.autopilot.app-debug-31:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/xml_service_config.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/xml/service_config.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/xml_widget_play_info.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/xml/widget_play_info.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/layout_widget_play.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/layout/widget_play.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/layout_activity_main.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-debug-31:/layout_scenario_editor.xml.flat",
+        "source": "com.example.autopilot.app-main-33:/layout/scenario_editor.xml"
+    }
+]

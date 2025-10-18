@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.example.autopilot.app-mergeDebugResources-30:/layout/widget_play.xml",
+        "source": "com.example.autopilot.app-main-33:/layout/widget_play.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-mergeDebugResources-30:/layout/scenario_editor.xml",
+        "source": "com.example.autopilot.app-main-33:/layout/scenario_editor.xml"
+    },
+    {
+        "merged": "com.example.autopilot.app-mergeDebugResources-30:/layout/activity_main.xml",
+        "source": "com.example.autopilot.app-main-33:/layout/activity_main.xml"
+    }
+]

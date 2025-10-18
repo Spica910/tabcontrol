@@ -11,7 +11,7 @@
     <string name="package_hint">패키지명 (예: com.example.target)</string>
     <string name="pick_app">앱 선택</string>
     <string name="export">내보내기</string>
-    <string name="import">가져오기</string>
+    <string name="import_label">가져오기</string>
     <string name="add_sleep">대기 추가</string>
     <string name="add_input_text">텍스트 입력 추가</string>
     <string name="add_swipe">스와이프 추가</string>

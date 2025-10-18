@@ -1,0 +1,243 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.autopilot"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="34" />
+10
+11    <queries>
+11-->/workspace/android/app/src/main/AndroidManifest.xml:5:5-11:15
+12
+13        <!-- allow querying launcher activities on API 30+ -->
+14        <intent>
+14-->/workspace/android/app/src/main/AndroidManifest.xml:7:9-10:18
+15            <action android:name="android.intent.action.MAIN" />
+15-->/workspace/android/app/src/main/AndroidManifest.xml:8:13-65
+15-->/workspace/android/app/src/main/AndroidManifest.xml:8:21-62
+16
+17            <category android:name="android.intent.category.LAUNCHER" />
+17-->/workspace/android/app/src/main/AndroidManifest.xml:9:13-73
+17-->/workspace/android/app/src/main/AndroidManifest.xml:9:23-70
+18        </intent>
+19    </queries>
+20
+21    <permission
+21-->[androidx.core:core:1.13.1] /home/ubuntu/.gradle/caches/transforms-4/eecbda8adc5521377f06f41deda43748/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+22        android:name="com.example.autopilot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+22-->[androidx.core:core:1.13.1] /home/ubuntu/.gradle/caches/transforms-4/eecbda8adc5521377f06f41deda43748/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+23        android:protectionLevel="signature" />
+23-->[androidx.core:core:1.13.1] /home/ubuntu/.gradle/caches/transforms-4/eecbda8adc5521377f06f41deda43748/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+24
+25    <uses-permission android:name="com.example.autopilot.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+25-->[androidx.core:core:1.13.1] /home/ubuntu/.gradle/caches/transforms-4/eecbda8adc5521377f06f41deda43748/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+25-->[androidx.core:core:1.13.1] /home/ubuntu/.gradle/caches/transforms-4/eecbda8adc5521377f06f41deda43748/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+26
+27    <application
+27-->/workspace/android/app/src/main/AndroidManifest.xml:13:5-86:19
+28        android:allowBackup="true"
+28-->/workspace/android/app/src/main/AndroidManifest.xml:14:9-35
+29        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+29-->[androidx.core:core:1.13.1] /home/ubuntu/.gradle/caches/transforms-4/eecbda8adc5521377f06f41deda43748/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+30        android:debuggable="true"
+31        android:extractNativeLibs="false"
+32        android:icon="@mipmap/ic_launcher"
+32-->/workspace/android/app/src/main/AndroidManifest.xml:16:9-43
+33        android:label="@string/app_name"
+33-->/workspace/android/app/src/main/AndroidManifest.xml:15:9-41
+34        android:roundIcon="@mipmap/ic_launcher_round"
+34-->/workspace/android/app/src/main/AndroidManifest.xml:17:9-54
+35        android:supportsRtl="true"
+35-->/workspace/android/app/src/main/AndroidManifest.xml:18:9-35
+36        android:theme="@style/Theme.AutoPilot" >
+36-->/workspace/android/app/src/main/AndroidManifest.xml:19:9-47
+37        <activity
+37-->/workspace/android/app/src/main/AndroidManifest.xml:21:9-27:20
+38            android:name="com.example.autopilot.MainActivity"
+38-->/workspace/android/app/src/main/AndroidManifest.xml:21:19-47
+39            android:exported="true" >
+39-->/workspace/android/app/src/main/AndroidManifest.xml:22:13-36
+40            <intent-filter>
+40-->/workspace/android/app/src/main/AndroidManifest.xml:23:13-26:29
+41                <action android:name="android.intent.action.MAIN" />
+41-->/workspace/android/app/src/main/AndroidManifest.xml:8:13-65
+41-->/workspace/android/app/src/main/AndroidManifest.xml:8:21-62
+42
+43                <category android:name="android.intent.category.LAUNCHER" />
+43-->/workspace/android/app/src/main/AndroidManifest.xml:9:13-73
+43-->/workspace/android/app/src/main/AndroidManifest.xml:9:23-70
+44            </intent-filter>
+45        </activity>
+46
+47        <service
+47-->/workspace/android/app/src/main/AndroidManifest.xml:29:9-31:40
+48            android:name="com.example.autopilot.capture.ScreenCaptureService"
+48-->/workspace/android/app/src/main/AndroidManifest.xml:30:13-57
+49            android:exported="false" />
+49-->/workspace/android/app/src/main/AndroidManifest.xml:31:13-37
+50
+51        <activity
+51-->/workspace/android/app/src/main/AndroidManifest.xml:33:9-36:48
+52            android:name="com.example.autopilot.picker.AppPickerActivity"
+52-->/workspace/android/app/src/main/AndroidManifest.xml:34:13-53
+53            android:exported="false"
+53-->/workspace/android/app/src/main/AndroidManifest.xml:35:13-37
+54            android:label="@string/pick_app" />
+54-->/workspace/android/app/src/main/AndroidManifest.xml:36:13-45
+55        <activity
+55-->/workspace/android/app/src/main/AndroidManifest.xml:38:9-41:50
+56            android:name="com.example.autopilot.ui.ScenarioEditorActivity"
+56-->/workspace/android/app/src/main/AndroidManifest.xml:39:13-54
+57            android:exported="false"
+57-->/workspace/android/app/src/main/AndroidManifest.xml:40:13-37
+58            android:label="@string/view_steps" />
+58-->/workspace/android/app/src/main/AndroidManifest.xml:41:13-47
+59
+60        <service
+60-->/workspace/android/app/src/main/AndroidManifest.xml:43:9-55:19
+61            android:name="com.example.autopilot.service.AutoPilotService"
+61-->/workspace/android/app/src/main/AndroidManifest.xml:44:13-53
+62            android:enabled="true"
+62-->/workspace/android/app/src/main/AndroidManifest.xml:45:13-35
+63            android:exported="false"
+63-->/workspace/android/app/src/main/AndroidManifest.xml:46:13-37
+64            android:label="@string/app_name"
+64-->/workspace/android/app/src/main/AndroidManifest.xml:47:13-45
+65            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+65-->/workspace/android/app/src/main/AndroidManifest.xml:48:13-79
+66            <intent-filter>
+66-->/workspace/android/app/src/main/AndroidManifest.xml:49:13-51:29
+67                <action android:name="android.accessibilityservice.AccessibilityService" />
+67-->/workspace/android/app/src/main/AndroidManifest.xml:50:17-92
+67-->/workspace/android/app/src/main/AndroidManifest.xml:50:25-89
+68            </intent-filter>
+69
+70            <meta-data
+70-->/workspace/android/app/src/main/AndroidManifest.xml:52:13-54:58
+71                android:name="android.accessibilityservice"
+71-->/workspace/android/app/src/main/AndroidManifest.xml:53:17-60
+72                android:resource="@xml/service_config" />
+72-->/workspace/android/app/src/main/AndroidManifest.xml:54:17-55
+73        </service>
+74        <service
+74-->/workspace/android/app/src/main/AndroidManifest.xml:57:9-60:40
+75            android:name="com.example.autopilot.service.IntentRelay"
+75-->/workspace/android/app/src/main/AndroidManifest.xml:58:13-48
+76            android:enabled="true"
+76-->/workspace/android/app/src/main/AndroidManifest.xml:59:13-35
+77            android:exported="false" />
+77-->/workspace/android/app/src/main/AndroidManifest.xml:60:13-37
+78
+79        <!-- Quick Settings Tile (Android 7+) -->
+80        <service
+80-->/workspace/android/app/src/main/AndroidManifest.xml:63:9-72:19
+81            android:name="com.example.autopilot.tiles.QuickTileService"
+81-->/workspace/android/app/src/main/AndroidManifest.xml:64:13-51
+82            android:exported="true"
+82-->/workspace/android/app/src/main/AndroidManifest.xml:68:13-36
+83            android:icon="@mipmap/ic_launcher"
+83-->/workspace/android/app/src/main/AndroidManifest.xml:66:13-47
+84            android:label="AutoPilot"
+84-->/workspace/android/app/src/main/AndroidManifest.xml:65:13-38
+85            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
+85-->/workspace/android/app/src/main/AndroidManifest.xml:67:13-77
+86            <intent-filter>
+86-->/workspace/android/app/src/main/AndroidManifest.xml:69:13-71:29
+87                <action android:name="android.service.quicksettings.action.QS_TILE" />
+87-->/workspace/android/app/src/main/AndroidManifest.xml:70:17-87
+87-->/workspace/android/app/src/main/AndroidManifest.xml:70:25-84
+88            </intent-filter>
+89        </service>
+90
+91        <!-- App Widget Provider -->
+92        <receiver
+92-->/workspace/android/app/src/main/AndroidManifest.xml:75:9-84:20
+93            android:name="com.example.autopilot.widget.PlayWidgetProvider"
+93-->/workspace/android/app/src/main/AndroidManifest.xml:76:13-54
+94            android:exported="false" >
+94-->/workspace/android/app/src/main/AndroidManifest.xml:77:13-37
+95            <intent-filter>
+95-->/workspace/android/app/src/main/AndroidManifest.xml:78:13-80:29
+96                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+96-->/workspace/android/app/src/main/AndroidManifest.xml:79:17-84
+96-->/workspace/android/app/src/main/AndroidManifest.xml:79:25-81
+97            </intent-filter>
+98
+99            <meta-data
+99-->/workspace/android/app/src/main/AndroidManifest.xml:81:13-83:60
+100                android:name="android.appwidget.provider"
+100-->/workspace/android/app/src/main/AndroidManifest.xml:82:17-58
+101                android:resource="@xml/widget_play_info" />
+101-->/workspace/android/app/src/main/AndroidManifest.xml:83:17-57
+102        </receiver>
+103
+104        <provider
+104-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+105            android:name="androidx.startup.InitializationProvider"
+105-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+106            android:authorities="com.example.autopilot.androidx-startup"
+106-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+107            android:exported="false" >
+107-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+108            <meta-data
+108-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+109                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+109-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+110                android:value="androidx.startup" />
+110-->[androidx.emoji2:emoji2:1.3.0] /home/ubuntu/.gradle/caches/transforms-4/868a55f7d79383792b26d5b53f15b066/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+111            <meta-data
+111-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/ubuntu/.gradle/caches/transforms-4/268940990c9a0cc9b2e07b4c29f87a74/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+112                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+112-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/ubuntu/.gradle/caches/transforms-4/268940990c9a0cc9b2e07b4c29f87a74/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+113                android:value="androidx.startup" />
+113-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/ubuntu/.gradle/caches/transforms-4/268940990c9a0cc9b2e07b4c29f87a74/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+114            <meta-data
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+115                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+116                android:value="androidx.startup" />
+116-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+117        </provider>
+118
+119        <receiver
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+120            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+120-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+121            android:directBootAware="false"
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+122            android:enabled="true"
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+123            android:exported="true"
+123-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+124            android:permission="android.permission.DUMP" >
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+125            <intent-filter>
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+126                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+126-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+126-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+127            </intent-filter>
+128            <intent-filter>
+128-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+129                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+129-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+129-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+130            </intent-filter>
+131            <intent-filter>
+131-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+132                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+132-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+132-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+133            </intent-filter>
+134            <intent-filter>
+134-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+135                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+135-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+135-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/ubuntu/.gradle/caches/transforms-4/fd50654ca51de888bd7dc200a40f860e/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+136            </intent-filter>
+137        </receiver>
+138    </application>
+139
+140</manifest>
