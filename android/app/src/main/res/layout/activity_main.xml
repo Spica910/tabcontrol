@@ -17,7 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/package_hint"
-        android:inputType="text" />
+        android:inputType="text"
+        android:autofillHints="username"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -37,6 +38,37 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="@string/launch_target" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+        <CheckBox
+            android:id="@+id/chkAutoPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="앱 실행 후 자동 재생" />
+        <CheckBox
+            android:id="@+id/chkRepeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="반복" />
+        <EditText
+            android:id="@+id/edtRepeatCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="횟수(0=무한)"
+            android:inputType="number"/>
+        <EditText
+            android:id="@+id/edtRepeatDelay"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="딜레이 ms"
+            android:inputType="number"/>
     </LinearLayout>
 
     <LinearLayout

@@ -7,6 +7,9 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.content.Intent
 import android.graphics.Rect
+import android.os.Handler
+import android.os.Looper
+import com.example.autopilot.data.Prefs
 
 class AutoPilotService : AccessibilityService() {
 
@@ -20,6 +23,8 @@ class AutoPilotService : AccessibilityService() {
     private var recording = false
     private var running = false
     private var currentIndex = 0
+    private val handler = Handler(Looper.getMainLooper())
+    private var repeatRemaining: Int = 0 // 0 = infinite when repeat enabled
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -86,16 +91,35 @@ class AutoPilotService : AccessibilityService() {
     }
 
     private fun stepNext() {
-        if (currentIndex >= steps.size) { running = false; return }
-        val ok = playStep(steps[currentIndex])
+        if (currentIndex >= steps.size) {
+            // Scenario finished
+            val repeatEnabled = Prefs.isRepeatEnabled(this)
+            if (repeatEnabled) {
+                val countPref = Prefs.getRepeatCount(this)
+                val delayMs = Prefs.getRepeatDelay(this)
+                if (countPref == 0 || repeatRemaining > 1) {
+                    if (countPref > 0) repeatRemaining -= 1
+                    currentIndex = 0
+                    handler.postDelayed({ stepNext() }, delayMs)
+                    return
+                }
+            }
+            running = false
+            return
+        }
+        playStep(steps[currentIndex])
         currentIndex += 1
-        if (running) stepNext()
+        if (running) handler.postDelayed({ stepNext() }, 250)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_TOGGLE_RECORD -> recording = !recording
-            ACTION_PLAY -> { running = true; currentIndex = 0; stepNext() }
+            ACTION_PLAY -> {
+                running = true; currentIndex = 0
+                repeatRemaining = Prefs.getRepeatCount(this)
+                stepNext()
+            }
             ACTION_STEP -> { if (!running) { running = true; stepNext(); running = false } }
             ACTION_CLEAR -> { steps.clear() }
         }
