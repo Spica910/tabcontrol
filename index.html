@@ -61,6 +61,37 @@
       </div>
     </div>
 
+    <!-- Scenario HUD and Overlay -->
+    <div id="scenarioHud" class="scenario-hud" role="region" aria-label="시나리오 HUD" data-scenario-ignore>
+      <div class="scenario-row">
+        <button id="scnRecord" class="hud-btn" aria-pressed="false">기록</button>
+        <button id="scnStop" class="hud-btn">정지</button>
+        <button id="scnPlay" class="hud-btn primary">재생</button>
+        <button id="scnStep" class="hud-btn">한 단계</button>
+        <label class="hud-check"><input id="scnAutopilot" type="checkbox" /> 자동</label>
+        <span id="scnCount" class="hud-count" aria-live="polite">0 단계</span>
+      </div>
+      <div class="scenario-row">
+        <button id="scnExport" class="hud-btn">내보내기</button>
+        <button id="scnImport" class="hud-btn">가져오기</button>
+        <input id="scnImportFile" type="file" accept="application/json" hidden data-scenario-ignore />
+        <button id="scnClear" class="hud-btn danger">초기화</button>
+        <button id="scnAttachHint" class="hud-btn">힌트 이미지</button>
+        <input id="scnHintFile" type="file" accept="image/*" hidden data-scenario-ignore />
+      </div>
+      <details id="scnDetails" class="scenario-details">
+        <summary>시나리오 단계</summary>
+        <ol id="scnSteps" class="scenario-steps" aria-live="polite"></ol>
+      </details>
+    </div>
+
+    <div id="scnOverlay" class="scenario-overlay" hidden data-scenario-ignore>
+      <div class="highlight" id="scnHighlight"></div>
+      <img id="scnHintImg" class="hint-image" alt="힌트 이미지" hidden />
+      <div id="scnTooltip" class="tooltip" hidden></div>
+    </div>
+
     <script src="app.js" defer></script>
+    <script src="scenario.js" defer></script>
   </body>
 </html>

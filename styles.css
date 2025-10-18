@@ -135,3 +135,29 @@ h1{margin:0 0 8px 0;font-size:20px}
 /* Orientation classes from JS as extra hooks if needed */
 html.is-portrait .orientation-label::after{content:" · 세로"}
 html.is-landscape .orientation-label::after{content:" · 가로"}
+
+/* Scenario HUD */
+.scenario-hud{
+  position: fixed; left: 12px; bottom: 12px; z-index: 50;
+  display: grid; gap: 6px; padding: 8px;
+  background: rgba(2,6,23,.75); border:1px solid rgba(255,255,255,.08);
+  border-radius: 12px; backdrop-filter: blur(6px) saturate(120%);
+}
+.scenario-row{display:flex;gap:6px;align-items:center}
+.hud-btn{
+  padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.06);
+  background:#0b1224;color:var(--text); cursor:pointer; font-size:12px;
+}
+.hud-btn.primary{background:var(--accent); color:#00131d; border-color:transparent}
+.hud-btn.danger{background:#241012; border-color:#3b0b0f; color:#ffd1d1}
+.hud-check{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.hud-count{font-size:12px;color:var(--muted)}
+.scenario-details summary{cursor:pointer;color:var(--muted);font-size:12px}
+.scenario-steps{margin:6px 0 0 18px; max-height: 24vh; overflow:auto; font-size:12px}
+.scenario-steps li{margin:2px 0}
+
+/* Scenario overlay */
+.scenario-overlay{position:fixed; inset:0; pointer-events:none; z-index:40}
+.scenario-overlay .highlight{position:absolute; border:2px solid var(--accent); border-radius:10px; box-shadow:0 0 0 4px rgba(14,165,233,.2)}
+.scenario-overlay .hint-image{position:absolute; max-width:35vw; max-height:40vh; border:1px solid rgba(255,255,255,.08); border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.scenario-overlay .tooltip{position:absolute; background:#0b1224; color:var(--text); font-size:12px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,.08)}
