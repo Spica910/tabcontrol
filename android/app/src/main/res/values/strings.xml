@@ -15,6 +15,12 @@
     <string name="add_sleep">대기 추가</string>
     <string name="add_input_text">텍스트 입력 추가</string>
     <string name="add_swipe">스와이프 추가</string>
+    <string name="add_find_image">이미지 스텝 추가</string>
+    <string name="scroll_until_text">스크롤 후 텍스트 찾기</string>
+    <string name="max_swipes">최대 스와이프</string>
+    <string name="direction">방향</string>
+    <string name="dir_down">아래</string>
+    <string name="dir_up">위</string>
     <string name="view_steps">스텝 보기</string>
     <string name="delete">삭제</string>
     <string name="move_up">위로</string>
