@@ -52,6 +52,12 @@ class MainActivity : ComponentActivity() {
         val edtWaitText = findViewById<EditText>(R.id.edtWaitText)
         val edtWaitTimeout = findViewById<EditText>(R.id.edtWaitTimeout)
         val btnAddWait = findViewById<Button>(R.id.btnAddWait)
+        val edtInputText = findViewById<EditText>(R.id.edtInputText)
+        val btnAddInputText = findViewById<Button>(R.id.btnAddInputText)
+        val edtSwipeXY1 = findViewById<EditText>(R.id.edtSwipeXY1)
+        val edtSwipeXY2 = findViewById<EditText>(R.id.edtSwipeXY2)
+        val edtSwipeDur = findViewById<EditText>(R.id.edtSwipeDur)
+        val btnAddSwipe = findViewById<Button>(R.id.btnAddSwipe)
 
         edtPackage.setText(vm.targetPackage)
 
@@ -125,6 +131,24 @@ class MainActivity : ComponentActivity() {
             if (t.isNotEmpty()) {
                 ScenarioBridge.addWaitText(this, t, timeout)
                 txtStatus.text = "상태: 텍스트 대기 스텝 추가"
+            }
+        }
+
+        btnAddInputText.setOnClickListener {
+            val t = edtInputText.text.toString()
+            if (t.isNotEmpty()) {
+                ScenarioBridge.addInputText(this, t)
+                txtStatus.text = "상태: 텍스트 입력 스텝 추가"
+            }
+        }
+
+        btnAddSwipe.setOnClickListener {
+            val p1 = edtSwipeXY1.text.toString().split(',').mapNotNull { it.trim().toIntOrNull() }
+            val p2 = edtSwipeXY2.text.toString().split(',').mapNotNull { it.trim().toIntOrNull() }
+            val dur = edtSwipeDur.text.toString().toLongOrNull() ?: 300L
+            if (p1.size==2 && p2.size==2) {
+                ScenarioBridge.addSwipe(this, p1[0], p1[1], p2[0], p2[1], dur)
+                txtStatus.text = "상태: 스와이프 스텝 추가"
             }
         }
     }

@@ -37,6 +37,56 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="12dp">
+        <EditText
+            android:id="@+id/edtInputText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="텍스트"/>
+        <Button
+            android:id="@+id/btnAddInputText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_input_text"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+        <EditText
+            android:id="@+id/edtSwipeXY1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="x1,y1"/>
+        <EditText
+            android:id="@+id/edtSwipeXY2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="x2,y2"/>
+        <EditText
+            android:id="@+id/edtSwipeDur"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="ms"/>
+        <Button
+            android:id="@+id/btnAddSwipe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_swipe"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
         <Button
             android:id="@+id/btnOpenAccessibility"
             android:layout_width="0dp"

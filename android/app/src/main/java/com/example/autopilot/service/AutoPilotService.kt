@@ -24,6 +24,8 @@ class AutoPilotService : AccessibilityService() {
         data class Tap(val ts: Long, val selector: String?, val rect: Rect?): Step()
         data class Sleep(val ms: Long): Step()
         data class WaitText(val text: String, val timeoutMs: Long): Step()
+        data class InputText(val text: String): Step()
+        data class Swipe(val x1: Int, val y1: Int, val x2: Int, val y2: Int, val dur: Long): Step()
     }
 
     private val steps = mutableListOf<Step>()
@@ -145,6 +147,23 @@ class AutoPilotService : AccessibilityService() {
                 waitForText(step.text, step.timeoutMs) { hideTip(); stepNext() }
                 false
             }
+            is Step.InputText -> {
+                showTip("텍스트 입력", null)
+                val root = rootInActiveWindow
+                val focus = root?.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
+                if (focus != null) {
+                    val args = android.os.Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, step.text) }
+                    focus.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args)
+                }
+                true
+            }
+            is Step.Swipe -> {
+                val path = Path().apply { moveTo(step.x1.toFloat(), step.y1.toFloat()); lineTo(step.x2.toFloat(), step.y2.toFloat()) }
+                val stroke = GestureDescription.StrokeDescription(path, 0, step.dur)
+                val gesture = GestureDescription.Builder().addStroke(stroke).build()
+                dispatchGesture(gesture, null, null)
+                true
+            }
         }
     }
 
@@ -240,6 +259,8 @@ class AutoPilotService : AccessibilityService() {
                     }
                     "sleep" -> steps.add(Step.Sleep(o.optLong("ms")))
                     "wait_text" -> steps.add(Step.WaitText(o.optString("text"), o.optLong("timeoutMs", 5000)))
+                    "input_text" -> steps.add(Step.InputText(o.optString("text")))
+                    "swipe" -> steps.add(Step.Swipe(o.optInt("x1"), o.optInt("y1"), o.optInt("x2"), o.optInt("y2"), o.optLong("dur", 300)))
                 }
             }
         } catch (_: Throwable) {}
