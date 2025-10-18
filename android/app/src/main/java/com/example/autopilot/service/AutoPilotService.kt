@@ -10,6 +10,13 @@ import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import com.example.autopilot.data.Prefs
+import org.json.JSONArray
+import org.json.JSONObject
+import android.view.WindowManager
+import android.view.Gravity
+import android.widget.TextView
+import android.graphics.Color
+import android.view.View
 
 class AutoPilotService : AccessibilityService() {
 
@@ -25,9 +32,13 @@ class AutoPilotService : AccessibilityService() {
     private var currentIndex = 0
     private val handler = Handler(Looper.getMainLooper())
     private var repeatRemaining: Int = 0 // 0 = infinite when repeat enabled
+    private var wm: WindowManager? = null
+    private var tipView: TextView? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        loadScenarioFromPrefs()
+        wm = getSystemService(WindowManager::class.java)
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -76,24 +87,62 @@ class AutoPilotService : AccessibilityService() {
         dispatchGesture(gesture, null, null)
     }
 
+    private fun showTip(text: String, rect: Rect?) {
+        val wm = wm ?: return
+        if (tipView == null) {
+            tipView = TextView(this).apply {
+                setBackgroundColor(0x88000000.toInt())
+                setTextColor(Color.WHITE)
+                setPadding(16, 8, 16, 8)
+            }
+            val p = WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                android.graphics.PixelFormat.TRANSLUCENT
+            )
+            p.gravity = Gravity.TOP or Gravity.START
+            wm.addView(tipView, p)
+        }
+        tipView?.text = text
+        val lp = tipView?.layoutParams as? WindowManager.LayoutParams ?: return
+        if (rect != null) {
+            lp.x = rect.centerX()
+            lp.y = rect.top - 80
+        } else { lp.x = 20; lp.y = 20 }
+        wm.updateViewLayout(tipView, lp)
+    }
+
+    private fun hideTip(){
+        val wm = wm; val tv = tipView
+        if (wm != null && tv != null) {
+            wm.removeView(tv)
+            tipView = null
+        }
+    }
+
     private fun playStep(step: Step): Boolean {
         return when(step) {
             is Step.Tap -> {
                 val node = findNodeBySelector(step.selector)
                 if (node != null) {
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                    hideTip()
                     true
                 } else {
                     val r = step.rect
-                    if (r != null) { tapRect(r); true } else false
+                    if (r != null) { showTip("여기를 탭", r); tapRect(r); true } else false
                 }
             }
             is Step.Sleep -> {
+                showTip("대기 ${step.ms}ms", null)
                 handler.postDelayed({ stepNext() }, step.ms)
                 false
             }
             is Step.WaitText -> {
-                waitForText(step.text, step.timeoutMs) { stepNext() }
+                showTip("텍스트 대기: ${step.text}", null)
+                waitForText(step.text, step.timeoutMs) { hideTip(); stepNext() }
                 false
             }
         }
@@ -142,7 +191,7 @@ class AutoPilotService : AccessibilityService() {
                 stepNext()
             }
             ACTION_STEP -> { if (!running) { running = true; stepNext(); running = false } }
-            ACTION_CLEAR -> { steps.clear() }
+            ACTION_CLEAR -> { steps.clear(); saveScenarioToPrefs() }
         }
         return START_STICKY
     }
@@ -152,5 +201,47 @@ class AutoPilotService : AccessibilityService() {
         const val ACTION_PLAY = "com.example.autopilot.PLAY"
         const val ACTION_STEP = "com.example.autopilot.STEP"
         const val ACTION_CLEAR = "com.example.autopilot.CLEAR"
+    }
+
+    private fun saveScenarioToPrefs(){
+        val pkg = Prefs.getTargetPackage(this)
+        val arr = JSONArray()
+        steps.forEach { s ->
+            when(s){
+                is Step.Tap -> arr.put(JSONObject().apply {
+                    put("type","tap"); put("ts", s.ts); put("selector", s.selector)
+                    s.rect?.let { r -> put("rect", JSONObject().apply { put("x", r.left); put("y", r.top); put("w", r.width()); put("h", r.height()) }) }
+                })
+                is Step.Sleep -> arr.put(JSONObject().apply { put("type","sleep"); put("ms", s.ms) })
+                is Step.WaitText -> arr.put(JSONObject().apply { put("type","wait_text"); put("text", s.text); put("timeoutMs", s.timeoutMs) })
+            }
+        }
+        val root = JSONObject().apply { put("steps", arr) }
+        Prefs.saveScenario(this, pkg, root.toString())
+    }
+
+    private fun loadScenarioFromPrefs(){
+        val pkg = Prefs.getTargetPackage(this)
+        val raw = Prefs.loadScenario(this, pkg)
+        steps.clear()
+        if (raw.isNullOrEmpty()) return
+        try {
+            val obj = JSONObject(raw)
+            val arr = obj.optJSONArray("steps") ?: JSONArray()
+            for (i in 0 until arr.length()){
+                val o = arr.getJSONObject(i)
+                when(o.optString("type")){
+                    "tap" -> {
+                        val rectObj = o.optJSONObject("rect")
+                        val rect = if (rectObj != null) android.graphics.Rect(
+                            rectObj.optInt("x"), rectObj.optInt("y"), rectObj.optInt("x") + rectObj.optInt("w"), rectObj.optInt("y") + rectObj.optInt("h")
+                        ) else null
+                        steps.add(Step.Tap(o.optLong("ts"), o.optString("selector", null), rect))
+                    }
+                    "sleep" -> steps.add(Step.Sleep(o.optLong("ms")))
+                    "wait_text" -> steps.add(Step.WaitText(o.optString("text"), o.optLong("timeoutMs", 5000)))
+                }
+            }
+        } catch (_: Throwable) {}
     }
 }

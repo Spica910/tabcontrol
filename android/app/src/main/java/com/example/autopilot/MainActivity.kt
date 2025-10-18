@@ -17,6 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import android.content.ComponentName
 import android.content.Context
 import com.example.autopilot.service.AutoPilotService
+import android.content.ClipData
+import android.content.ClipboardManager
 
 class MainViewModel: ViewModel() {
     var targetPackage: String = ""
@@ -39,10 +41,17 @@ class MainActivity : ComponentActivity() {
         val btnPlay = findViewById<Button>(R.id.btnPlay)
         val btnStep = findViewById<Button>(R.id.btnStep)
         val btnClear = findViewById<Button>(R.id.btnClear)
+        val btnExport = findViewById<Button>(R.id.btnExport)
+        val btnImport = findViewById<Button>(R.id.btnImport)
         val chkAutoPlay = findViewById<CheckBox>(R.id.chkAutoPlay)
         val chkRepeat = findViewById<CheckBox>(R.id.chkRepeat)
         val edtRepeatCount = findViewById<EditText>(R.id.edtRepeatCount)
         val edtRepeatDelay = findViewById<EditText>(R.id.edtRepeatDelay)
+        val edtSleepMs = findViewById<EditText>(R.id.edtSleepMs)
+        val btnAddSleep = findViewById<Button>(R.id.btnAddSleep)
+        val edtWaitText = findViewById<EditText>(R.id.edtWaitText)
+        val edtWaitTimeout = findViewById<EditText>(R.id.edtWaitTimeout)
+        val btnAddWait = findViewById<Button>(R.id.btnAddWait)
 
         edtPackage.setText(vm.targetPackage)
 
@@ -89,6 +98,35 @@ class MainActivity : ComponentActivity() {
         btnPlay.setOnClickListener { sendToService(AutoPilotService.ACTION_PLAY) }
         btnStep.setOnClickListener { sendToService(AutoPilotService.ACTION_STEP) }
         btnClear.setOnClickListener { sendToService(AutoPilotService.ACTION_CLEAR) }
+
+        btnExport.setOnClickListener {
+            val cm = getSystemService(ClipboardManager::class.java)
+            val json = ScenarioBridge.export(this)
+            cm.setPrimaryClip(ClipData.newPlainText("scenario", json))
+            txtStatus.text = "상태: 시나리오 클립보드로 내보냄"
+        }
+        btnImport.setOnClickListener {
+            val cm = getSystemService(ClipboardManager::class.java)
+            val text = cm.primaryClip?.getItemAt(0)?.text?.toString()
+            if (!text.isNullOrEmpty()) {
+                ScenarioBridge.import(this, text)
+                txtStatus.text = "상태: 시나리오 가져오기 완료"
+            }
+        }
+
+        btnAddSleep.setOnClickListener {
+            val ms = edtSleepMs.text.toString().toLongOrNull() ?: return@setOnClickListener
+            ScenarioBridge.addSleep(this, ms)
+            txtStatus.text = "상태: 대기 스텝 추가"
+        }
+        btnAddWait.setOnClickListener {
+            val t = edtWaitText.text.toString()
+            val timeout = edtWaitTimeout.text.toString().toLongOrNull() ?: 5000L
+            if (t.isNotEmpty()) {
+                ScenarioBridge.addWaitText(this, t, timeout)
+                txtStatus.text = "상태: 텍스트 대기 스텝 추가"
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
