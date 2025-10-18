@@ -1,0 +1,228 @@
+package com.example.autopilot
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.provider.Settings
+import android.widget.Button
+import android.widget.EditText
+import android.widget.CheckBox
+import android.widget.TextView
+import android.app.Activity
+import com.example.autopilot.picker.AppPickerActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import android.content.ComponentName
+import android.content.Context
+import com.example.autopilot.service.AutoPilotService
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.net.Uri
+import android.graphics.BitmapFactory
+import android.util.Base64
+import android.app.Activity.RESULT_OK
+import android.hardware.display.MediaProjectionManager
+import com.example.autopilot.capture.ScreenCaptureService
+
+class MainViewModel: ViewModel() {
+    var targetPackage: String = ""
+}
+
+class MainActivity : ComponentActivity() {
+
+    private val vm: MainViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val txtStatus = findViewById<TextView>(R.id.txtStatus)
+        val edtPackage = findViewById<EditText>(R.id.edtPackage)
+        val btnOpenAccessibility = findViewById<Button>(R.id.btnOpenAccessibility)
+        val btnLaunch = findViewById<Button>(R.id.btnLaunch)
+        val btnPickApp = findViewById<Button>(R.id.btnPickApp)
+        val btnRecord = findViewById<Button>(R.id.btnRecord)
+        val btnPlay = findViewById<Button>(R.id.btnPlay)
+        val btnStep = findViewById<Button>(R.id.btnStep)
+        val btnClear = findViewById<Button>(R.id.btnClear)
+        val btnViewSteps = findViewById<Button>(R.id.btnViewSteps)
+        val btnExport = findViewById<Button>(R.id.btnExport)
+        val btnImport = findViewById<Button>(R.id.btnImport)
+        val chkAutoPlay = findViewById<CheckBox>(R.id.chkAutoPlay)
+        val chkRepeat = findViewById<CheckBox>(R.id.chkRepeat)
+        val edtRepeatCount = findViewById<EditText>(R.id.edtRepeatCount)
+        val edtRepeatDelay = findViewById<EditText>(R.id.edtRepeatDelay)
+        val edtSleepMs = findViewById<EditText>(R.id.edtSleepMs)
+        val btnAddSleep = findViewById<Button>(R.id.btnAddSleep)
+        val edtWaitText = findViewById<EditText>(R.id.edtWaitText)
+        val edtWaitTimeout = findViewById<EditText>(R.id.edtWaitTimeout)
+        val btnAddWait = findViewById<Button>(R.id.btnAddWait)
+        val edtInputText = findViewById<EditText>(R.id.edtInputText)
+        val btnAddInputText = findViewById<Button>(R.id.btnAddInputText)
+        val edtSwipeXY1 = findViewById<EditText>(R.id.edtSwipeXY1)
+        val edtSwipeXY2 = findViewById<EditText>(R.id.edtSwipeXY2)
+        val edtSwipeDur = findViewById<EditText>(R.id.edtSwipeDur)
+        val btnAddSwipe = findViewById<Button>(R.id.btnAddSwipe)
+        val edtScrollText = findViewById<EditText>(R.id.edtScrollText)
+        val edtScrollMax = findViewById<EditText>(R.id.edtScrollMax)
+        val chkScrollDown = findViewById<CheckBox>(R.id.chkScrollDown)
+        val btnAddScrollText = findViewById<Button>(R.id.btnAddScrollText)
+        val edtImageLabel = findViewById<EditText>(R.id.edtImageLabel)
+        val btnAddFindImage = findViewById<Button>(R.id.btnAddFindImage)
+        val edtTemplateThreshold = findViewById<EditText>(R.id.edtTemplateThreshold)
+        val btnPickTemplate = findViewById<Button>(R.id.btnPickTemplate)
+        val btnAddTemplateStep = findViewById<Button>(R.id.btnAddTemplateStep)
+
+        edtPackage.setText(vm.targetPackage)
+
+        // Load prefs
+        edtPackage.setText(data.Prefs.getTargetPackage(this))
+        chkAutoPlay.isChecked = data.Prefs.isAutoPlay(this)
+        chkRepeat.isChecked = data.Prefs.isRepeatEnabled(this)
+        edtRepeatCount.setText(data.Prefs.getRepeatCount(this).toString())
+        edtRepeatDelay.setText(data.Prefs.getRepeatDelay(this).toString())
+
+        btnOpenAccessibility.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+
+        btnPickApp.setOnClickListener {
+            startActivityForResult(Intent(this, AppPickerActivity::class.java), 1001)
+        }
+
+        // Request screen capture permission
+        val mpm = getSystemService(MediaProjectionManager::class.java)
+        startActivityForResult(mpm.createScreenCaptureIntent(), 2001)
+
+        btnLaunch.setOnClickListener {
+            vm.targetPackage = edtPackage.text.toString().trim()
+            data.Prefs.setTargetPackage(this, vm.targetPackage)
+            data.Prefs.setAutoPlay(this, chkAutoPlay.isChecked)
+            data.Prefs.setRepeatEnabled(this, chkRepeat.isChecked)
+            data.Prefs.setRepeatCount(this, edtRepeatCount.text.toString().toIntOrNull() ?: 0)
+            data.Prefs.setRepeatDelay(this, edtRepeatDelay.text.toString().toLongOrNull() ?: 500)
+            val launchIntent = packageManager.getLaunchIntentForPackage(vm.targetPackage)
+            if (launchIntent != null) {
+                startActivity(launchIntent)
+                txtStatus.text = "상태: 대상 앱 실행됨"
+                if (chkAutoPlay.isChecked) {
+                    sendToService(service.AutoPilotService.ACTION_PLAY)
+                }
+            } else {
+                txtStatus.text = "상태: 패키지 찾을 수 없음"
+            }
+        }
+
+        fun sendToService(action: String){
+            val intent = Intent(this, AutoPilotService::class.java).apply { this.action = action }
+            startService(intent)
+        }
+
+        btnRecord.setOnClickListener { sendToService(AutoPilotService.ACTION_TOGGLE_RECORD) }
+        btnPlay.setOnClickListener { sendToService(AutoPilotService.ACTION_PLAY) }
+        btnStep.setOnClickListener { sendToService(AutoPilotService.ACTION_STEP) }
+        btnClear.setOnClickListener { sendToService(AutoPilotService.ACTION_CLEAR) }
+        btnViewSteps.setOnClickListener { startActivity(Intent(this, com.example.autopilot.ui.ScenarioEditorActivity::class.java)) }
+
+        btnExport.setOnClickListener {
+            val cm = getSystemService(ClipboardManager::class.java)
+            val json = ScenarioBridge.export(this)
+            cm.setPrimaryClip(ClipData.newPlainText("scenario", json))
+            txtStatus.text = "상태: 시나리오 클립보드로 내보냄"
+        }
+        btnImport.setOnClickListener {
+            val cm = getSystemService(ClipboardManager::class.java)
+            val text = cm.primaryClip?.getItemAt(0)?.text?.toString()
+            if (!text.isNullOrEmpty()) {
+                ScenarioBridge.import(this, text)
+                txtStatus.text = "상태: 시나리오 가져오기 완료"
+            }
+        }
+
+        btnAddSleep.setOnClickListener {
+            val ms = edtSleepMs.text.toString().toLongOrNull() ?: return@setOnClickListener
+            ScenarioBridge.addSleep(this, ms)
+            txtStatus.text = "상태: 대기 스텝 추가"
+        }
+        btnAddWait.setOnClickListener {
+            val t = edtWaitText.text.toString()
+            val timeout = edtWaitTimeout.text.toString().toLongOrNull() ?: 5000L
+            if (t.isNotEmpty()) {
+                ScenarioBridge.addWaitText(this, t, timeout)
+                txtStatus.text = "상태: 텍스트 대기 스텝 추가"
+            }
+        }
+
+        btnAddInputText.setOnClickListener {
+            val t = edtInputText.text.toString()
+            if (t.isNotEmpty()) {
+                ScenarioBridge.addInputText(this, t)
+                txtStatus.text = "상태: 텍스트 입력 스텝 추가"
+            }
+        }
+
+        btnAddSwipe.setOnClickListener {
+            val p1 = edtSwipeXY1.text.toString().split(',').mapNotNull { it.trim().toIntOrNull() }
+            val p2 = edtSwipeXY2.text.toString().split(',').mapNotNull { it.trim().toIntOrNull() }
+            val dur = edtSwipeDur.text.toString().toLongOrNull() ?: 300L
+            if (p1.size==2 && p2.size==2) {
+                ScenarioBridge.addSwipe(this, p1[0], p1[1], p2[0], p2[1], dur)
+                txtStatus.text = "상태: 스와이프 스텝 추가"
+            }
+        }
+
+        btnAddScrollText.setOnClickListener {
+            val t = edtScrollText.text.toString()
+            val max = edtScrollMax.text.toString().toIntOrNull() ?: 5
+            ScenarioBridge.addScrollUntilText(this, t, max, chkScrollDown.isChecked)
+            txtStatus.text = "상태: 스크롤-텍스트 스텝 추가"
+        }
+
+        btnAddFindImage.setOnClickListener {
+            val label = edtImageLabel.text.toString()
+            if (label.isNotEmpty()) {
+                ScenarioBridge.addFindImageLabel(this, label)
+                txtStatus.text = "상태: 이미지 라벨 스텝 추가"
+            }
+        }
+
+        var pickedImageBase64: String? = null
+        btnPickTemplate.setOnClickListener {
+            val i = Intent(Intent.ACTION_OPEN_DOCUMENT).apply { addCategory(Intent.CATEGORY_OPENABLE); type = "image/*" }
+            startActivityForResult(i, 2002)
+        }
+        btnAddTemplateStep.setOnClickListener {
+            val th = edtTemplateThreshold.text.toString().toFloatOrNull() ?: 0.9f
+            val img = pickedImageBase64 ?: return@setOnClickListener
+            ScenarioBridge.addTemplateStep(this, img, th)
+            txtStatus.text = "상태: 템플릿 스텝 추가"
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == Activity.RESULT_OK) {
+            val pkg = data?.getStringExtra("package") ?: return
+            data.Prefs.setTargetPackage(this, pkg)
+            findViewById<EditText>(R.id.edtPackage).setText(pkg)
+        }
+        if (requestCode == 2001 && resultCode == RESULT_OK) {
+            // Start ScreenCaptureService
+            val i = Intent(this, ScreenCaptureService::class.java).apply {
+                action = ScreenCaptureService.ACTION_START
+                putExtra(ScreenCaptureService.EXTRA_CODE, resultCode)
+                putExtra(ScreenCaptureService.EXTRA_DATA, data)
+            }
+            startService(i)
+        }
+        if (requestCode == 2002 && resultCode == Activity.RESULT_OK) {
+            val uri: Uri = data?.data ?: return
+            contentResolver.openInputStream(uri)?.use { ins ->
+                val bytes = ins.readBytes()
+                pickedImageBase64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
+            }
+        }
+    }
+}

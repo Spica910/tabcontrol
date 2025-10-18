@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <title>화면 방향 & 직관적 반복 인터랙션 데모</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Demo</div>
+      <div id="orientationLabel" class="orientation-label" aria-live="polite">방향 감지 중…</div>
+    </header>
+
+    <main class="app" id="appRoot">
+      <section class="panel primary" aria-labelledby="panelTitle">
+        <h1 id="panelTitle">반복 동작 데모</h1>
+        <p class="subtitle">세로/가로에 맞춰 레이아웃이 바뀌고, 누르기 조작이 직관적입니다.</p>
+
+        <div class="counter-wrap">
+          <div class="counter-label">카운터</div>
+          <div id="counterValue" class="counter" aria-live="polite">0</div>
+        </div>
+
+        <div class="controls">
+          <button id="actionBtn" class="quick-action" aria-label="실행" aria-pressed="false">
+            <span class="quick-action__ring" aria-hidden="true"></span>
+            <span class="quick-action__icon" aria-hidden="true">＋</span>
+            <span class="quick-action__text">실행</span>
+          </button>
+
+          <button id="resetBtn" class="btn" aria-label="리셋">리셋</button>
+        </div>
+
+        <ul class="hints-inline" aria-hidden="true">
+          <li><strong>한 번 탭</strong>: 1회 실행</li>
+          <li><strong>두 번 탭</strong>: 연속 모드 토글</li>
+          <li><strong>길게 누르기</strong>: 누르는 동안 반복 실행 (가속)</li>
+        </ul>
+      </section>
+
+      <aside class="panel secondary" aria-label="상태">
+        <div class="status">
+          <div class="status-row"><span>연속 모드</span><span id="stickyStatus">끄기</span></div>
+          <div class="status-row"><span>반복 속도</span><span id="speedStatus">정지</span></div>
+        </div>
+      </aside>
+    </main>
+
+    <div id="hintOverlay" class="hint-overlay" hidden role="dialog" aria-modal="false" aria-labelledby="hintTitle">
+      <div class="hint-card">
+        <h2 id="hintTitle">빠른 사용법</h2>
+        <ol class="hint-list">
+          <li>한 번 탭: 1회 실행</li>
+          <li>두 번 탭: 연속 모드 토글</li>
+          <li>길게 누르기: 누르는 동안 반복 실행 (가속)</li>
+        </ol>
+        <button id="hintDismiss" class="btn primary">확인</button>
+      </div>
+    </div>
+
+    <!-- Scenario HUD and Overlay -->
+    <div id="scenarioHud" class="scenario-hud" role="region" aria-label="시나리오 HUD" data-scenario-ignore>
+      <div class="scenario-row">
+        <button id="scnRecord" class="hud-btn" aria-pressed="false">기록</button>
+        <button id="scnStop" class="hud-btn">정지</button>
+        <button id="scnPlay" class="hud-btn primary">재생</button>
+        <button id="scnStep" class="hud-btn">한 단계</button>
+        <label class="hud-check"><input id="scnAutopilot" type="checkbox" /> 자동</label>
+        <span id="scnCount" class="hud-count" aria-live="polite">0 단계</span>
+      </div>
+      <div class="scenario-row">
+        <button id="scnExport" class="hud-btn">내보내기</button>
+        <button id="scnImport" class="hud-btn">가져오기</button>
+        <input id="scnImportFile" type="file" accept="application/json" hidden data-scenario-ignore />
+        <button id="scnClear" class="hud-btn danger">초기화</button>
+        <button id="scnAttachHint" class="hud-btn">힌트 이미지</button>
+        <input id="scnHintFile" type="file" accept="image/*" hidden data-scenario-ignore />
+      </div>
+      <details id="scnDetails" class="scenario-details">
+        <summary>시나리오 단계</summary>
+        <ol id="scnSteps" class="scenario-steps" aria-live="polite"></ol>
+      </details>
+    </div>
+
+    <div id="scnOverlay" class="scenario-overlay" hidden data-scenario-ignore>
+      <div class="highlight" id="scnHighlight"></div>
+      <img id="scnHintImg" class="hint-image" alt="힌트 이미지" hidden />
+      <div id="scnTooltip" class="tooltip" hidden></div>
+    </div>
+
+    <script src="app.js" defer></script>
+    <script src="scenario.js" defer></script>
+  </body>
+</html>
