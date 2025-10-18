@@ -8,6 +8,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.CheckBox
 import android.widget.TextView
+import android.app.Activity
+import com.example.autopilot.picker.AppPickerActivity
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
         val edtPackage = findViewById<EditText>(R.id.edtPackage)
         val btnOpenAccessibility = findViewById<Button>(R.id.btnOpenAccessibility)
         val btnLaunch = findViewById<Button>(R.id.btnLaunch)
+        val btnPickApp = findViewById<Button>(R.id.btnPickApp)
         val btnRecord = findViewById<Button>(R.id.btnRecord)
         val btnPlay = findViewById<Button>(R.id.btnPlay)
         val btnStep = findViewById<Button>(R.id.btnStep)
@@ -52,6 +55,10 @@ class MainActivity : ComponentActivity() {
 
         btnOpenAccessibility.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+
+        btnPickApp.setOnClickListener {
+            startActivityForResult(Intent(this, AppPickerActivity::class.java), 1001)
         }
 
         btnLaunch.setOnClickListener {
@@ -82,5 +89,14 @@ class MainActivity : ComponentActivity() {
         btnPlay.setOnClickListener { sendToService(AutoPilotService.ACTION_PLAY) }
         btnStep.setOnClickListener { sendToService(AutoPilotService.ACTION_STEP) }
         btnClear.setOnClickListener { sendToService(AutoPilotService.ACTION_CLEAR) }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001 && resultCode == Activity.RESULT_OK) {
+            val pkg = data?.getStringExtra("package") ?: return
+            data.Prefs.setTargetPackage(this, pkg)
+            findViewById<EditText>(R.id.edtPackage).setText(pkg)
+        }
     }
 }

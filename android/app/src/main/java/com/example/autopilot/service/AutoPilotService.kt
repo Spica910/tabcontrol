@@ -13,11 +13,11 @@ import com.example.autopilot.data.Prefs
 
 class AutoPilotService : AccessibilityService() {
 
-    data class Step(
-        val ts: Long,
-        val selector: String?,
-        val rect: Rect?
-    )
+    sealed class Step {
+        data class Tap(val ts: Long, val selector: String?, val rect: Rect?): Step()
+        data class Sleep(val ms: Long): Step()
+        data class WaitText(val text: String, val timeoutMs: Long): Step()
+    }
 
     private val steps = mutableListOf<Step>()
     private var recording = false
@@ -37,7 +37,7 @@ class AutoPilotService : AccessibilityService() {
             val r = Rect()
             src.getBoundsInScreen(r)
             val selector = buildSelector(src)
-            steps.add(Step(System.currentTimeMillis(), selector, Rect(r)))
+            steps.add(Step.Tap(System.currentTimeMillis(), selector, Rect(r)))
         }
     }
 
@@ -77,17 +77,38 @@ class AutoPilotService : AccessibilityService() {
     }
 
     private fun playStep(step: Step): Boolean {
-        val node = findNodeBySelector(step.selector)
-        if (node != null) {
-            node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-            return true
+        return when(step) {
+            is Step.Tap -> {
+                val node = findNodeBySelector(step.selector)
+                if (node != null) {
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                    true
+                } else {
+                    val r = step.rect
+                    if (r != null) { tapRect(r); true } else false
+                }
+            }
+            is Step.Sleep -> {
+                handler.postDelayed({ stepNext() }, step.ms)
+                false
+            }
+            is Step.WaitText -> {
+                waitForText(step.text, step.timeoutMs) { stepNext() }
+                false
+            }
         }
-        val r = step.rect
-        if (r != null) {
-            tapRect(r)
-            return true
+    }
+
+    private fun waitForText(text: String, timeoutMs: Long, onDone: () -> Unit){
+        val start = System.currentTimeMillis()
+        fun tick(){
+            val root = rootInActiveWindow
+            val found = root?.findAccessibilityNodeInfosByText(text)?.isNotEmpty() == true
+            if (found) { onDone(); return }
+            if (System.currentTimeMillis() - start > timeoutMs) { onDone(); return }
+            handler.postDelayed({ tick() }, 200)
         }
-        return false
+        tick()
     }
 
     private fun stepNext() {
@@ -107,9 +128,9 @@ class AutoPilotService : AccessibilityService() {
             running = false
             return
         }
-        playStep(steps[currentIndex])
-        currentIndex += 1
-        if (running) handler.postDelayed({ stepNext() }, 250)
+        val advanced = playStep(steps[currentIndex])
+        if (advanced) currentIndex += 1
+        if (running && advanced) handler.postDelayed({ stepNext() }, 250)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
