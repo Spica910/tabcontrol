@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="업무 자동화 도우미"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. 먼저 접근성 서비스를 활성화하세요"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btn_enable_accessibility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="접근성 서비스 활성화"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2. 자동화할 앱 설정"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="앱 패키지 이름:"
+            android:textSize="12sp"/>
+
+        <EditText
+            android:id="@+id/edit_package_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="예: com.example.app"
+            android:inputType="text"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3. 클릭할 좌표 (선택사항)"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="X 좌표:"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/edit_click_x"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="500"
+                    android:inputType="number"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Y 좌표:"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/edit_click_y"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="1000"
+                    android:inputType="number"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4. 실행 시간 설정"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TimePicker
+            android:id="@+id/time_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:timePickerMode="spinner"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btn_schedule_task"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="작업 예약하기 (매일 반복)"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btn_test_now"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="지금 테스트"
+            android:backgroundTint="#4CAF50"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="\n사용 방법:\n1. 접근성 서비스 활성화\n2. 자동화할 앱의 패키지명 입력\n3. 클릭할 좌표 입력 (선택)\n4. 실행 시간 설정\n5. '작업 예약하기' 클릭\n\n참고: 앱 패키지명은 설정 > 앱에서 확인할 수 있습니다."
+            android:textSize="12sp"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:background="#F5F5F5"/>
+
+    </LinearLayout>
+</ScrollView>
