@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <!-- QUERY_ALL_PACKAGES removed: requires special Google Play approval and prevents installation on most devices -->
 
     <application
@@ -14,14 +15,32 @@
         android:label="Automation Helper"
         android:theme="@style/AppTheme">
 
+        <!-- Main activity with new UX -->
         <activity
-            android:name=".MainActivity"
+            android:name=".NewMainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- App picker -->
+        <activity
+            android:name=".AppPickerActivity"
+            android:exported="false"
+            android:label="앱 선택"/>
+
+        <!-- Scenario recorder -->
+        <activity
+            android:name=".ScenarioRecorderActivity"
+            android:exported="false"
+            android:label="시나리오 녹화"/>
+
+        <!-- Old main activity (kept for reference) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
 
         <service
             android:name=".AutomationAccessibilityService"
