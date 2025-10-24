@@ -19,55 +19,84 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Set up Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 33
-          build-tools: 33.0.2
+          api-level: 34
+          build-tools: 34.0.0
 
-      - name: Cache Gradle
+      - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle/wrapper/gradle-wrapper.properties') }}
+            ~/.android/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Verify Gradle Wrapper
+        run: |
+          ./gradlew --version
+
+      - name: Download dependencies
+        run: |
+          ./gradlew dependencies --no-daemon || true
+
+      - name: Clean build
+        run: ./gradlew clean --no-daemon --stacktrace
+
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        id: build_debug
+        run: |
+          echo "Building Debug APK..."
+          ./gradlew assembleDebug --no-daemon --stacktrace --info
+
+          # Verify APK was created
+          if [ ! -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            echo "❌ Debug APK not found!"
+            exit 1
+          fi
+
+          echo "✅ Debug APK built successfully"
+          ls -lh app/build/outputs/apk/debug/app-debug.apk
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
-
-      - name: Find APKs
-        id: find_apks
+        id: build_release
         run: |
-          DEBUG_APK=$(find . -type f -path "*/app/build/outputs/apk/debug/*.apk" -print | head -n1)
-          RELEASE_APK=$(find . -type f -path "*/app/build/outputs/apk/release/*.apk" -print | head -n1)
-          echo "debug_apk=${DEBUG_APK}" >> $GITHUB_OUTPUT
-          echo "release_apk=${RELEASE_APK}" >> $GITHUB_OUTPUT
-          echo "Debug APK: ${DEBUG_APK}"
-          echo "Release APK: ${RELEASE_APK}"
+          echo "Building Release APK..."
+          ./gradlew assembleRelease --no-daemon --stacktrace --info
+
+          # Verify APK was created
+          if [ ! -f app/build/outputs/apk/release/app-release.apk ]; then
+            echo "❌ Release APK not found!"
+            exit 1
+          fi
+
+          echo "✅ Release APK built successfully"
+          ls -lh app/build/outputs/apk/release/app-release.apk
 
       - name: Upload Debug APK as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: ${{ steps.find_apks.outputs.debug_apk }}
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
 
       - name: Upload Release APK as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: ${{ steps.find_apks.outputs.release_apk }}
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
 
       - name: Get current date
         id: date
@@ -83,13 +112,23 @@ jobs:
           tag_name: build-${{ steps.date.outputs.date }}
           release_name: APK Build ${{ steps.date.outputs.date }}
           body: |
-            Automated APK build from commit ${{ github.sha }}
+            ## 🤖 Automated APK Build
 
-            ## Downloads
-            - **app-debug.apk**: Debug version for testing
-            - **app-release.apk**: Release version
+            **Commit:** ${{ github.sha }}
+            **Built on:** ${{ steps.date.outputs.date }}
 
-            Built on: ${{ steps.date.outputs.date }}
+            ### 📦 Downloads
+            - **app-debug.apk**: Debug version (테스트용, 설치 가능)
+            - **app-release.apk**: Release version (배포용, 서명됨)
+
+            ### 📝 Changes
+            ${{ github.event.head_commit.message }}
+
+            ### ✅ Installation
+            1. Download APK file
+            2. Transfer to Android device
+            3. Enable "Install from Unknown Sources"
+            4. Tap APK to install
           draft: false
           prerelease: false
 
@@ -100,7 +139,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_apks.outputs.debug_apk }}
+          asset_path: app/build/outputs/apk/debug/app-debug.apk
           asset_name: app-debug.apk
           asset_content_type: application/vnd.android.package-archive
 
@@ -111,6 +150,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_apks.outputs.release_apk }}
+          asset_path: app/build/outputs/apk/release/app-release.apk
           asset_name: app-release.apk
           asset_content_type: application/vnd.android.package-archive
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "## 📊 Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            echo "✅ Debug APK: $(ls -lh app/build/outputs/apk/debug/app-debug.apk | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Debug APK: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            echo "✅ Release APK: $(ls -lh app/build/outputs/apk/release/app-release.apk | awk '{print $5}')" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Release APK: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
