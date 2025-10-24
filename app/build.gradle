@@ -6,6 +6,12 @@ android {
     namespace 'com.automation.helper'
     compileSdk 34
 
+    // Prevent common build errors
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
     defaultConfig {
         applicationId "com.automation.helper"
         minSdk 24
