@@ -1,0 +1,116 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 33
+          build-tools: 33.0.2
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Find APKs
+        id: find_apks
+        run: |
+          DEBUG_APK=$(find . -type f -path "*/app/build/outputs/apk/debug/*.apk" -print | head -n1)
+          RELEASE_APK=$(find . -type f -path "*/app/build/outputs/apk/release/*.apk" -print | head -n1)
+          echo "debug_apk=${DEBUG_APK}" >> $GITHUB_OUTPUT
+          echo "release_apk=${RELEASE_APK}" >> $GITHUB_OUTPUT
+          echo "Debug APK: ${DEBUG_APK}"
+          echo "Release APK: ${RELEASE_APK}"
+
+      - name: Upload Debug APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: ${{ steps.find_apks.outputs.debug_apk }}
+
+      - name: Upload Release APK as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: ${{ steps.find_apks.outputs.release_apk }}
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: build-${{ steps.date.outputs.date }}
+          release_name: APK Build ${{ steps.date.outputs.date }}
+          body: |
+            Automated APK build from commit ${{ github.sha }}
+
+            ## Downloads
+            - **app-debug.apk**: Debug version for testing
+            - **app-release.apk**: Release version
+
+            Built on: ${{ steps.date.outputs.date }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Debug APK to Release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find_apks.outputs.debug_apk }}
+          asset_name: app-debug.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload Release APK to Release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find_apks.outputs.release_apk }}
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
